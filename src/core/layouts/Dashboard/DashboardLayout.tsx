@@ -18,7 +18,7 @@ export default function DashboardLayout() {
     const matches = window.matchMedia(
       `screen and (max-width: ${theme.breakpoints.md})`
     );
-    setNavbarOpen(!matches);
+    setNavbarOpen(!matches.matches);
   }, []);
 
   const toggle = () => setNavbarOpen(!navbarOpen);

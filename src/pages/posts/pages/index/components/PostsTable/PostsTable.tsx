@@ -5,16 +5,15 @@ import { TablePagination } from "@src/lib/components/Table/TablePagination";
 import { usePagination } from "@src/lib/hooks/usePagination";
 import { usePaginationValues } from "@src/lib/hooks/usePaginationValues";
 import { Spacing } from "@src/lib/utils/Spacing/Spacing";
-import React from "react";
+import { useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { MdEditNote } from "react-icons/md";
 import { IoMdEye } from "react-icons/io";
 import { Flex } from "@src/lib/layout/Flex/Flex";
-import { useMediaQuery } from "usehooks-ts";
-import { useTheme } from "styled-components";
 import { Popper } from "@src/lib/components/Popper/Popper";
 import { useNavigate } from "react-router-dom";
 import { useDeletePost } from "@src/pages/posts/store/hooks/useGetPosts";
+import { DeleteDialog } from "../DeleteDialog/DeleteDialog";
 
 type PostsTableProps = { data: Post[] };
 export const PostsTable = ({ data }: PostsTableProps) => {
@@ -28,17 +27,18 @@ export const PostsTable = ({ data }: PostsTableProps) => {
     searchKey: "title",
   });
 
-  const theme = useTheme();
-  // const isMobile = useMediaQuery(`(max-width : ${theme.breakpoints.md})`);
-
-  const { mutate, isLoading } = useDeletePost();
-
-  if (isLoading) return <p>Loading...</p>;
+  const [toBeDeleted, setToBeDeleted] = useState<string | undefined>();
+  const [open, setOpen] = useState(false);
+  const handleOnClose = () => {
+    setOpen(false);
+    setToBeDeleted(undefined);
+  };
 
   return (
     <>
       <TableHeader />
       <Spacing my="1rem" />
+      <DeleteDialog open={open} id={toBeDeleted} onClose={handleOnClose} />
 
       <Table
         data={posts}
@@ -71,7 +71,13 @@ export const PostsTable = ({ data }: PostsTableProps) => {
                     </IconButton>
                   </Popper>
                   <Popper title="Delete">
-                    <IconButton size="md" onClick={() => mutate(post.id)}>
+                    <IconButton
+                      size="md"
+                      onClick={() => {
+                        setToBeDeleted(post.id.toString());
+                        setOpen(true);
+                      }}
+                    >
                       <MdDelete />
                     </IconButton>
                   </Popper>
